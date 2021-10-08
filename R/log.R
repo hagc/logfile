@@ -3,21 +3,22 @@
 #' Internal functions to be called from within another functions (see details).
 #'
 #' These functions are used together to write logfiles containing information related
-#' to the outputs produced by the function that calls these internal functions (e.g. \code{\link{D1}}).
+#' to the outputs produced by the function that calls these internal functions.
 #' The functions should be used as follows:
 #'
 #' \code{.openlog} opens a log file
 #'
+#' \code{.addlog} optionally adds additional messages to the log.
+#'
 #' \code{.closelog} closes the log file opened by \code{.openlog}.
 #'
-#' \code{.addlog} optionally adds additional messages to the log.
 #'
 #' Note that if arguments \code{filename} and \code{dir.output} are missing,
 #' they must be defined in the environment of the function that calls the internal functions (see examples).
 #'
 #' The name of the logfile produced is defined by the \code{filename} plus the extension .txt.
 #' Therefore, the logfile has the same name of the product it refers to
-#' (e.g. 200km_2p5m_N20E98_agg20m.tif.txt, produced by \code{\link{D1}}).
+#' (e.g. output_of_a_function.txt).
 #' The log file is saved in directory "logfiles", found inside the folder of \code{filename}.
 #'
 #' The content of the logfile is devided in three sections:
@@ -42,8 +43,6 @@
 #' @param ...  character. Strings to be concatenated and form a message.
 #' @param sep a character string to separate the strings passed via \code{...} (see \code{\link{paste}})
 #'
-#' @seealso
-#' \code{\link{internal.check}}, \code{\link{internal.settings}}, \code{\link{internal.utils}}
 #'
 #' @examples
 #' x<-file.path(tempdir(),"S2A_L2A_20171002_T29SNC.tif")
@@ -69,8 +68,8 @@ NULL
 #' @rdname internal.logfiles
 .openlog<-function(filename, fun){
   if(missing(filename)) filename<-get("filename", envir = parent.frame()) # get the product name related to the logfile
-  .check_classes("character", filename)
-  if(!missing(fun)) .check_classes("character", fun)
+  # .check_classes("character", filename)
+  # if(!missing(fun)) .check_classes("character", fun)
   assign("t_start", Sys.time(), envir = parent.frame())                   # make start time visible to .closelog()
   logname<-file.path(tempdir(), paste0(basename(filename),".txt"))        # define path to a temporary logfile
   assign("logfile", file(logname, open="a"),envir = parent.frame())       # open connection to the temporary logfile
@@ -104,7 +103,7 @@ NULL
 
 #' @rdname internal.logfiles
 .addlog<-function(..., sep = " "){
-  .check_classes("character", sep)
+  # .check_classes("character", sep)
   logfile<-get("logfile", envir = parent.frame())          # get the logfile opened by .openlog
   cat(paste(...,sep=sep), file=logfile, sep="\n")          # write message in the logfile
 }
@@ -113,8 +112,8 @@ NULL
 #' @rdname internal.logfiles
 .closelog<-function(dir.output, cancel=FALSE){
   if(missing(dir.output)) dir.output<-get("dir.output",envir=parent.frame())  # find the output directory of the product related to the logfile
-  .check_classes("character", dir.output)
-  .check_classes("logical", cancel)
+  # .check_classes("character", dir.output)
+  # .check_classes("logical", cancel)
   logfile<-get("logfile", envir = parent.frame())                             # get the logfile opened by .openlog
   logname<-summary(logfile)$description                                       # temporary location of the logfile
 
